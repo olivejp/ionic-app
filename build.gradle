@@ -1,0 +1,25 @@
+task incrementMinorVersion() {
+    def srcFile = file('./config.xml')
+    def widget = new XmlParser().parse(srcFile)
+    def versionSplite = widget.@version.split('..')
+    def length = versionSplite.length
+    def lastElement = Integer.valueOf(versionSplite[length-1]) + 1
+    def newVersion
+    for (def i = 0; i <length; i++) {
+        def value = (!versionSplite[i]) ? '0' : versionSplite[i]
+        if (i > 0) {
+            if (i == length - 1) {
+                newVersion = newVersion + '.' + lastElement
+            } else {
+                newVersion = newVersion + '.' + value
+            }
+        } else {
+            newVersion = value
+        }
+    }
+    widget.@version = newVersion
+    def writer = new XmlNodePrinter(new PrintWriter(new FileWriter(srcFile)))
+    writer.preserveWhitespace = true
+    writer.print(widget)
+    println newVersion
+}
